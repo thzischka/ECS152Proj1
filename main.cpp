@@ -3,6 +3,37 @@
 #include <string>
 using namespace std;
 
+std::string int2bin(int i)
+{
+    std::string buffer = "";
+    buffer += to_string(i / 128);
+    i = i % 128;
+    buffer += to_string(i / 64);
+    i = i % 64;
+    buffer += to_string(i / 32);
+    i = i % 32;
+    buffer += to_string(i / 16);
+    i = i % 16;
+    buffer += to_string(i / 8);
+    i = i % 8;
+    buffer += to_string(i / 4);
+    i = i % 4;
+    buffer += to_string(i / 2);
+    i = i % 2;
+    buffer += to_string(i);
+    return buffer;
+}
+
+std::string convertIPtoBinary(int i, int j, int k, int l)
+{
+    std::string str1 = int2bin(i);
+    std::string str2 = int2bin(j);
+    std::string str3 = int2bin(k);
+    std::string str4 = int2bin(l);
+    std::string address = str1 + str2 + str3 + str4;
+    return address;
+}
+
 int main() {
     cout << "Hello, World!" << endl;
 
@@ -32,6 +63,7 @@ int main() {
 
     int mask[200000];
     int AS[200000];
+    std::string DBIP[200000];
 
     //==============================
     // Database input parsing
@@ -61,11 +93,11 @@ int main() {
         }
 
         if (doParse) {
-            cout << databaseIndex << ": " << ip[0] << "." << ip[1] << "." << ip[2] << "." << ip[3] << ' ' << mask[databaseIndex] << ' ' << AS[databaseIndex] << endl;
+            DBIP[databaseIndex] = convertIPtoBinary(ip[0], ip[1], ip[2], ip[3]);
+            //cout << databaseIndex << ": " << ip[0] << "." << ip[1] << "." << ip[2] << "." << ip[3] << ' ' << mask[databaseIndex] << ' ' << AS[databaseIndex] << endl;
             databaseIndex++;
         }
 
-        // Insert Binary Conversion code here and move database into array
     }
 
     cout << "Finished Database Input" << endl;
@@ -89,13 +121,16 @@ int main() {
         }
 
         // Insert Binary Conversion code
-
+        //I should reuse the variable searchIP, right?
+        searchIP = convertIPtoBinary(ip[0], ip[1], ip[2], ip[3]);
         cout << "Search Term " << searchIndex + 1 << ": " << ip[0] << "." << ip[1] << "." << ip[2] << "." << ip[3] << endl;
         searchIndex++;
     }
 
 
     inFile.close();
+
+    //should this go earlier?
     database.close();
     return 0;
 }
