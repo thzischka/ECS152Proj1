@@ -34,13 +34,13 @@ int main() {
     int AS[200000];
 
 
-    int index = 0;          //used to iterate through database parse
+    int databaseIndex = 0;          //used to iterate through database parse
     string databaseIP;  //database ip temp variable
     int ip [4];         //ip temp variables
     while (!database.eof()) {                                              //iterate until end of file
         database >> databaseIP;     // input next ip address
-        database >> mask[index];
-        database >> AS[index];
+        database >> mask[databaseIndex];
+        database >> AS[databaseIndex];
         bool doParse = 1;
         int j = 0;                                                      // Initialize the J
         int oldj = 0;                                                   // Initialize the oldJ
@@ -59,14 +59,20 @@ int main() {
         }
 
         if (doParse) {
-            cout << ip[0] << "." << ip[1] << "." << ip[2] << "." << ip[3] << ' ' << mask[index] << ' ' << AS[index] << endl;
+            cout << databaseIndex << ": " << ip[0] << "." << ip[1] << "." << ip[2] << "." << ip[3] << ' ' << mask[databaseIndex] << ' ' << AS[databaseIndex] << endl;
         }
 
-        // Instert Binary Conversion code here
-        index++;
+        // Insert Binary Conversion code here and move database into array
+        databaseIndex++;
     }
 
+    cout << "Finished Database Input" << endl;
+
+    //================================
+    // Input IP search list
+    //================================
     string searchIP;
+    int searchIndex = 0;
     while (!inFile.eof()) {                                              //iterate until end of file
         inFile >> searchIP;
         int j = 0;                                                      // Initialize the J
@@ -80,8 +86,10 @@ int main() {
             oldj = j+1;         // iterate
             j++;                // iterate
         }
-        //Display each entry to terminal : cout << ip[0] << "." << ip[1] << "." << ip[2] << "." << ip[3] << endl;
+        cout << "Search Term " << searchIndex + 1 << ": " << ip[0] << "." << ip[1] << "." << ip[2] << "." << ip[3] << endl;
+        searchIndex++;
     }
+
 
     inFile.close();
     database.close();
