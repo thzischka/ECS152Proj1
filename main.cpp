@@ -49,8 +49,8 @@ int main() {
 
     ifstream inFile;
     ifstream database;
-    inFile.open("C:\\Users\\tuckr\\OneDrive\\Documents\\EEC 173\\Assignment1\\IPlist.txt");
-    database.open("C:\\Users\\tuckr\\OneDrive\\Documents\\EEC 173\\Assignment1\\DB_091803.txt");
+    inFile.open("IPlist.txt");
+    database.open("DB_091803.txt");
     if (!inFile) {
         cerr << "Unable to open file IPlist.txt";
         exit(1);   // call system to stop
@@ -82,9 +82,9 @@ int main() {
             while (databaseIP[j] != '.' && j != databaseIP.size()) {    //Find end of byte string
                 j++;                                                    //Iterate
             }
-            if (databaseIP[j+1] == '.' && i != 3 || oldj >= databaseIP.size()){
+            if ((databaseIP[j+1] == '.' && i != 3) || oldj >= databaseIP.size()){
                 doParse = 0;    // Do not parse
-                cout << "exception handled";
+                cout << "exception handled" << endl;
                 break;          // Erroneous .. checker
             }
             ip[i] = stoi(databaseIP.substr(oldj,j - oldj + 1));  // Insert
@@ -101,7 +101,7 @@ int main() {
     }
 
     cout << "Finished Database Input" << endl;
-
+    database.close();
     //================================
     // Input IP search list
     //================================
@@ -123,14 +123,16 @@ int main() {
         // Insert Binary Conversion code
         //I should reuse the variable searchIP, right?
         searchIP = convertIPtoBinary(ip[0], ip[1], ip[2], ip[3]);
-        cout << "Search Term " << searchIndex + 1 << ": " << ip[0] << "." << ip[1] << "." << ip[2] << "." << ip[3] << endl;
+        cout << "Current IP Search Term: " << searchIP << endl;
+
+        //putting the matching code here.
+
+
+        //cout << "Search Term " << searchIndex + 1 << ": " << ip[0] << "." << ip[1] << "." << ip[2] << "." << ip[3] << endl;
         searchIndex++;
     }
 
 
     inFile.close();
-
-    //should this go earlier?
-    database.close();
     return 0;
 }
