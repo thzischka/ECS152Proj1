@@ -38,22 +38,31 @@ int main() {
     string databaseIP;  //database ip temp variable
     int ip [4];         //ip temp variables
     while (!database.eof()) {                                              //iterate until end of file
-        database >> databaseIP;                                         // input next ip address
+        database >> databaseIP;     // input next ip address
+        database >> mask[index];
+        database >> AS[index];
+        bool doParse = 1;
         int j = 0;                                                      // Initialize the J
         int oldj = 0;                                                   // Initialize the oldJ
         for (int i = 0; i < 4; i++) {                                   //For loop to get ip address
             while (databaseIP[j] != '.' && j != databaseIP.size()) {        //Find end of byte string
                 j++;                                                    //Iterate
             }
+            if (databaseIP[j+1] == '.' && i != 3 || oldj >= databaseIP.size()){
+                doParse = 0;    // Do not parse
+                cout << "exception handled";
+                break;          // Erroneous .. checker
+            }
             ip[i] = stoi(databaseIP.substr(oldj,j - oldj + 1));             //insert
-            oldj = j+1;         // iterate
-            j++;                // iterate
+            oldj = j+1;         // Iterate
+            j++;                // Iterate
         }
-        database >> mask[index];
-        database >> AS[index];
-        cout << ip[0] << "." << ip[1] << "." << ip[2] << "." << ip[3] << ' ' << mask[index] << ' ' << AS[index] << endl;
-        // Instert Binary Conversion code here
 
+        if (doParse) {
+            cout << ip[0] << "." << ip[1] << "." << ip[2] << "." << ip[3] << ' ' << mask[index] << ' ' << AS[index] << endl;
+        }
+
+        // Instert Binary Conversion code here
         index++;
     }
 
@@ -67,6 +76,7 @@ int main() {
                 j++;                                                    //Iterate
             }
             ip[i] = stoi(searchIP.substr(oldj,j - oldj + 1));             //insert
+            // add if statement
             oldj = j+1;         // iterate
             j++;                // iterate
         }
