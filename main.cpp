@@ -33,11 +33,13 @@ int main() {
     int mask[200000];
     int AS[200000];
 
-
+    //==============================
+    // Database input parsing
+    //==============================
     int databaseIndex = 0;          //used to iterate through database parse
-    string databaseIP;  //database ip temp variable
-    int ip [4];         //ip temp variables
-    while (!database.eof()) {                                              //iterate until end of file
+    string databaseIP;              //database ip temp variable
+    int ip [4];                     //ip temp variables
+    while (!database.eof()) {       //iterate until end of file
         database >> databaseIP;     // input next ip address
         database >> mask[databaseIndex];
         database >> AS[databaseIndex];
@@ -45,7 +47,7 @@ int main() {
         int j = 0;                                                      // Initialize the J
         int oldj = 0;                                                   // Initialize the oldJ
         for (int i = 0; i < 4; i++) {                                   //For loop to get ip address
-            while (databaseIP[j] != '.' && j != databaseIP.size()) {        //Find end of byte string
+            while (databaseIP[j] != '.' && j != databaseIP.size()) {    //Find end of byte string
                 j++;                                                    //Iterate
             }
             if (databaseIP[j+1] == '.' && i != 3 || oldj >= databaseIP.size()){
@@ -53,17 +55,17 @@ int main() {
                 cout << "exception handled";
                 break;          // Erroneous .. checker
             }
-            ip[i] = stoi(databaseIP.substr(oldj,j - oldj + 1));             //insert
-            oldj = j+1;         // Iterate
-            j++;                // Iterate
+            ip[i] = stoi(databaseIP.substr(oldj,j - oldj + 1));  // Insert
+            oldj = j+1;                                                 // Iterate
+            j++;                                                        // Iterate
         }
 
         if (doParse) {
             cout << databaseIndex << ": " << ip[0] << "." << ip[1] << "." << ip[2] << "." << ip[3] << ' ' << mask[databaseIndex] << ' ' << AS[databaseIndex] << endl;
+            databaseIndex++;
         }
 
         // Insert Binary Conversion code here and move database into array
-        databaseIndex++;
     }
 
     cout << "Finished Database Input" << endl;
@@ -81,11 +83,13 @@ int main() {
             while (searchIP[j] != '.' && j != searchIP.size()) {        //Find end of byte string
                 j++;                                                    //Iterate
             }
-            ip[i] = stoi(searchIP.substr(oldj,j - oldj + 1));             //insert
-            // add if statement
-            oldj = j+1;         // iterate
-            j++;                // iterate
+            ip[i] = stoi(searchIP.substr(oldj,j - oldj + 1));    //insert
+            oldj = j+1;                                                 // iterate
+            j++;                                                        // iterate
         }
+
+        // Insert Binary Conversion code
+
         cout << "Search Term " << searchIndex + 1 << ": " << ip[0] << "." << ip[1] << "." << ip[2] << "." << ip[3] << endl;
         searchIndex++;
     }
@@ -95,13 +99,3 @@ int main() {
     database.close();
     return 0;
 }
-
-
-/*
-  if (temp1 > temp2) {
-      cout << "It works" << endl;
-  }
-  if (temp1 < temp2){
-      cout << "It also works" << endl;
-  }
-  */
