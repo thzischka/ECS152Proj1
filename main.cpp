@@ -31,18 +31,16 @@ int main() {
 
 
     string searchIP;
-    inFile >> searchIP;
-    
     int ip [4];
-    while (!inFile.eof()) {     //iterate until end of file
+    while (!inFile.eof()) {                                              //iterate until end of file
         inFile >> searchIP;
-        int j = 0;              // Initialize the J
-        int oldj = 0;           // Initialize the oldJ
-        for (int i = 0; i < 4; i++) {          //For loop to get ip address
-            while (searchIP[j] != '.' && searchIP[j] != '\n') {        //Find end of byte string
-                j++;                           //Iterate
+        int j = 0;                                                      // Initialize the J
+        int oldj = 0;                                                   // Initialize the oldJ
+        for (int i = 0; i < 4; i++) {                                   //For loop to get ip address
+            while (searchIP[j] != '.' && j != searchIP.size()) {        //Find end of byte string
+                j++;                                                    //Iterate
             }
-            ip[i] = stoi(searchIP.substr(oldj,j));        //insert
+            ip[i] = stoi(searchIP.substr(oldj,j - oldj + 1));             //insert
             oldj = j+1;         // iterate
             j++;                // iterate
         }
