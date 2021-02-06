@@ -1,7 +1,36 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <stdlib.h>
 using namespace std;
+
+std::string bin2int(string bin)
+{
+    string substr;
+    string returnstr;
+    int i, j, k, l;
+    substr.assign(bin, 0, 8);
+ //   cout << substr << " ";
+    i = stoi(substr, nullptr, 2);
+ //   cout << i << ". ";
+   // itoa(i, substr, 10);
+   // returnstr.append(substr).append(".");
+    substr.assign(bin, 8, 8);
+  //  cout << substr << " ";
+    j = stoi(substr, nullptr, 2);
+ //   cout << j << ". ";
+    substr.assign(bin, 16, 8);
+ //   cout << substr << " ";
+    k = stoi(substr, nullptr, 2);
+ //   cout << k << ". ";
+    substr.assign(bin, 24, 8);
+ //   cout << substr << " ";
+    l = stoi(substr, nullptr, 2);
+ //   cout << l << ". " << endl;
+    returnstr = to_string(i) + "." + to_string(j) + "." + to_string(k) + "." + to_string(l);
+    //returnstr = "Hello\n";
+    return returnstr;
+}
 
 std::string int2bin(int i)
 {
@@ -35,7 +64,7 @@ std::string convertIPtoBinary(int i, int j, int k, int l)
 }
 
 int main() {
-    cout << "Hello, World!" << endl;
+ //   cout << "Hello, World!" << endl;
 
     // Input two tables
     // First Loop, iterate through IP table
@@ -63,7 +92,8 @@ int main() {
 
     int mask[200000];
     int AS[200000];
-    std::string DBIP[200000];
+   // string DBIP[200000];
+    string DBIPBin[200000];
 
     //==============================
     // Database input parsing
@@ -75,6 +105,7 @@ int main() {
         database >> databaseIP;     // input next ip address
         database >> mask[databaseIndex];
         database >> AS[databaseIndex];
+       // DBIP[databaseIndex] = databaseIP;
         bool doParse = 1;
         int j = 0;                                                      // Initialize the J
         int oldj = 0;                                                   // Initialize the oldJ
@@ -84,7 +115,7 @@ int main() {
             }
             if ((databaseIP[j+1] == '.' && i != 3) || oldj >= databaseIP.size()){
                 doParse = 0;    // Do not parse
-                cout << "exception handled" << endl;
+    //            cout << "exception handled" << endl;
                 break;          // Erroneous .. checker
             }
             ip[i] = stoi(databaseIP.substr(oldj,j - oldj + 1));  // Insert
@@ -93,19 +124,20 @@ int main() {
         }
 
         if (doParse) {
-            DBIP[databaseIndex] = convertIPtoBinary(ip[0], ip[1], ip[2], ip[3]);
+            DBIPBin[databaseIndex] = convertIPtoBinary(ip[0], ip[1], ip[2], ip[3]);
             //cout << databaseIndex << ": " << ip[0] << "." << ip[1] << "." << ip[2] << "." << ip[3] << ' ' << mask[databaseIndex] << ' ' << AS[databaseIndex] << endl;
             databaseIndex++;
         }
 
     }
 
-    cout << "Finished Database Input" << endl;
+//    cout << "Finished Database Input" << endl;
     database.close();
     //================================
     // Input IP search list
     //================================
     string searchIP;
+    string searchIPbin;
     int searchIndex = 0;
     while (!inFile.eof()) {                                              //iterate until end of file
         inFile >> searchIP;
@@ -122,13 +154,35 @@ int main() {
 
         // Insert Binary Conversion code
         //I should reuse the variable searchIP, right?
-        searchIP = convertIPtoBinary(ip[0], ip[1], ip[2], ip[3]);
-        cout << "Current IP Search Term: " << searchIP << endl;
+        searchIPbin = convertIPtoBinary(ip[0], ip[1], ip[2], ip[3]);
+   //     cout << "Current IP Search Term: " << searchIP << endl;
 
         //putting the matching code here.
+        int maxMatchLength = 0;
+        int matchIndex = 0;
+        for(int dbIndex = 0; dbIndex < 200000; dbIndex++)
+        {
+            /*possible exception handler
+            if(DBIPBin[dbIndex] == NULL)
+                break;*/
+            //this is true if there's a match
+            if(mask[dbIndex] > maxMatchLength)
+            {
+                if(searchIPbin.compare(0, mask[dbIndex], DBIPBin[dbIndex], 0, mask[dbIndex]) == 0)
+                {
+                  //  cout << "match found for " << DBIPBin[dbIndex] << "/" << mask[dbIndex] << endl;
+                    maxMatchLength = mask[dbIndex];
+                    matchIndex = dbIndex;
+                }
+            }
+        }
 
+      //  cout << "converted: " << bin2int(DBIPBin[matchIndex]) << endl;
 
-        //cout << "Search Term " << searchIndex + 1 << ": " << ip[0] << "." << ip[1] << "." << ip[2] << "." << ip[3] << endl;
+        cout << bin2int(DBIPBin[matchIndex]) << "/" << mask[matchIndex] << " " << AS[matchIndex] << " " << searchIP << endl;
+
+       // //    cout << "Therefore for IP address " << searchIP << ": mask is " << mask[matchIndex] << endl;
+       // //cout << "Search Term " << searchIndex + 1 << ": " << ip[0] << "." << ip[1] << "." << ip[2] << "." << ip[3] << endl;
         searchIndex++;
     }
 
