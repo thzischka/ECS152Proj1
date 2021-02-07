@@ -14,6 +14,7 @@ Or skip using this command altogther by using a built-in C++ compilier in an IDE
 Or compile our code however pleases you best.
 
 Run our project using the terminal command:
-  ./ip2as <DB file> <IP file>
+  ./ip2as DBfilename.txt IPlist.txt
+Of course, replace the database and IP search list filenames with what you have.
 
 How our project works:
