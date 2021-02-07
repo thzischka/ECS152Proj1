@@ -4,34 +4,31 @@
 #include <stdlib.h>
 using namespace std;
 
+/*
+ * bin2int inputs a binary 32-bit IP address string and
+ * outputs a CIDR formatted address string (ex "219.45.0.255")
+ * This function is meant to convert a binary formatted IP address back into
+ * a CIDR format for printing to the output.
+ */
 std::string bin2int(string bin)
 {
     string substr;
     string returnstr;
     int i, j, k, l;
     substr.assign(bin, 0, 8);
- //   cout << substr << " ";
     i = stoi(substr, nullptr, 2);
- //   cout << i << ". ";
-   // itoa(i, substr, 10);
-   // returnstr.append(substr).append(".");
     substr.assign(bin, 8, 8);
-  //  cout << substr << " ";
     j = stoi(substr, nullptr, 2);
- //   cout << j << ". ";
     substr.assign(bin, 16, 8);
- //   cout << substr << " ";
     k = stoi(substr, nullptr, 2);
- //   cout << k << ". ";
     substr.assign(bin, 24, 8);
- //   cout << substr << " ";
     l = stoi(substr, nullptr, 2);
- //   cout << l << ". " << endl;
     returnstr = to_string(i) + "." + to_string(j) + "." + to_string(k) + "." + to_string(l);
-    //returnstr = "Hello\n";
     return returnstr;
 }
 
+/* int2bin inputs an integer value and returns an 8-bit binary string
+ * this function is a helper function to convertIPtoBinary */
 std::string int2bin(int i)
 {
     std::string buffer = "";
@@ -53,6 +50,9 @@ std::string int2bin(int i)
     return buffer;
 }
 
+/*convertIPtoBinary inputs 4 integer values and
+ * outputs a single 32-bit binary string (ex "11110000111100001010010110100000")
+ * output is meant to be used for IP address matching in main function. */
 std::string convertIPtoBinary(int i, int j, int k, int l)
 {
     std::string str1 = int2bin(i);
@@ -63,8 +63,7 @@ std::string convertIPtoBinary(int i, int j, int k, int l)
     return address;
 }
 
-int main() {
- //   cout << "Hello, World!" << endl;
+int main(int argc, char * argv[]) {
 
     // Input two tables
     // First Loop, iterate through IP table
@@ -76,24 +75,29 @@ int main() {
     // if not, continue on
     // repeat
 
+    if(argc != 3)
+    {
+        cout << "Incorrect number of arguments" << endl;
+        cout << "Correct usage is: \"./a.out [database file] [IP address file]\"" << endl;
+        exit(1);
+    }
+
     ifstream inFile;
     ifstream database;
-    inFile.open("IPlist.txt");
-    database.open("DB_091803.txt");
+    database.open(argv[1]);  //open database file
+    inFile.open(argv[2]);    //open IP list file
     if (!inFile) {
-        cerr << "Unable to open file IPlist.txt";
+        cerr << "Unable to open file IPlist.txt" << endl;
         exit(1);   // call system to stop
     }
     if (!database) {
-        cerr << "Unable to open file Database";
+        cerr << "Unable to open file Database" << endl;
         exit(1);   // call system to stop
     }
 
-
-    int mask[200000];
-    int AS[200000];
-   // string DBIP[200000];
-    string DBIPBin[200000];
+    int mask[200000];               //array for storing database bit mask lengths
+    int AS[200000];                 //array for storing database AS numbers
+    string DBIPBin[200000];         //array for storing database IP addresses in binary string format
 
     //==============================
     // Database input parsing
@@ -105,7 +109,6 @@ int main() {
         database >> databaseIP;     // input next ip address
         database >> mask[databaseIndex];
         database >> AS[databaseIndex];
-       // DBIP[databaseIndex] = databaseIP;
         bool doParse = 1;
         int j = 0;                                                      // Initialize the J
         int oldj = 0;                                                   // Initialize the oldJ
@@ -113,9 +116,9 @@ int main() {
             while (databaseIP[j] != '.' && j != databaseIP.size()) {    //Find end of byte string
                 j++;                                                    //Iterate
             }
+            //handling invalid IP addresses
             if ((databaseIP[j+1] == '.' && i != 3) || oldj >= databaseIP.size()){
                 doParse = 0;    // Do not parse
-    //            cout << "exception handled" << endl;
                 break;          // Erroneous .. checker
             }
             ip[i] = stoi(databaseIP.substr(oldj,j - oldj + 1));  // Insert
@@ -123,16 +126,16 @@ int main() {
             j++;                                                        // Iterate
         }
 
+        //If IP address is invalid, this code does not run
+        //and the array index will not increment
         if (doParse) {
             DBIPBin[databaseIndex] = convertIPtoBinary(ip[0], ip[1], ip[2], ip[3]);
-            //cout << databaseIndex << ": " << ip[0] << "." << ip[1] << "." << ip[2] << "." << ip[3] << ' ' << mask[databaseIndex] << ' ' << AS[databaseIndex] << endl;
             databaseIndex++;
         }
 
     }
-
-//    cout << "Finished Database Input" << endl;
     database.close();
+
     //================================
     // Input IP search list
     //================================
@@ -152,40 +155,34 @@ int main() {
             j++;                                                        // iterate
         }
 
-        // Insert Binary Conversion code
-        //I should reuse the variable searchIP, right?
+        //Binary Conversion code
         searchIPbin = convertIPtoBinary(ip[0], ip[1], ip[2], ip[3]);
-   //     cout << "Current IP Search Term: " << searchIP << endl;
 
-        //putting the matching code here.
+        //=======================
+        //Finding and printing a match in the database
+        //=======================
         int maxMatchLength = 0;
         int matchIndex = 0;
         for(int dbIndex = 0; dbIndex < 200000; dbIndex++)
         {
-            /*possible exception handler
-            if(DBIPBin[dbIndex] == NULL)
-                break;*/
-            //this is true if there's a match
+            //check if entry can possibly be a longer prefix match
             if(mask[dbIndex] > maxMatchLength)
             {
+                //compare substrings as long as the bit mask to see if a match is found
                 if(searchIPbin.compare(0, mask[dbIndex], DBIPBin[dbIndex], 0, mask[dbIndex]) == 0)
                 {
-                  //  cout << "match found for " << DBIPBin[dbIndex] << "/" << mask[dbIndex] << endl;
-                    maxMatchLength = mask[dbIndex];
-                    matchIndex = dbIndex;
+                    //match is found!
+                    maxMatchLength = mask[dbIndex]; //update the maxMatchLength
+                    matchIndex = dbIndex; //save the index into matchIndex
                 }
             }
         }
 
-      //  cout << "converted: " << bin2int(DBIPBin[matchIndex]) << endl;
-
+        //printing the CIDR formatted IP database address and AS number as well as the searched IP address
         cout << bin2int(DBIPBin[matchIndex]) << "/" << mask[matchIndex] << " " << AS[matchIndex] << " " << searchIP << endl;
-
-       // //    cout << "Therefore for IP address " << searchIP << ": mask is " << mask[matchIndex] << endl;
-       // //cout << "Search Term " << searchIndex + 1 << ": " << ip[0] << "." << ip[1] << "." << ip[2] << "." << ip[3] << endl;
+        //go to next IP address in file
         searchIndex++;
     }
-
 
     inFile.close();
     return 0;
