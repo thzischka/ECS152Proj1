@@ -97,7 +97,7 @@ int main(int argc, char * argv[]) {
 
     int mask[200000];               //array for storing database bit mask lengths
     int AS[200000];                 //array for storing database AS numbers
-    string DBIPBin[200000];         //array for storing database IP addresses in binary string format
+    static string DBIPBin[200000];         //array for storing database IP addresses in binary string format
 
     //==============================
     // Database input parsing
@@ -143,7 +143,12 @@ int main(int argc, char * argv[]) {
     string searchIPbin;
     int searchIndex = 0;
     while (!inFile.eof()) {                                              //iterate until end of file
+
         inFile >> searchIP;
+        if (searchIP.size() == 0)
+        {
+            continue;
+        }
         int j = 0;                                                      // Initialize the J
         int oldj = 0;                                                   // Initialize the oldJ
         for (int i = 0; i < 4; i++) {                                   //For loop to get ip address
